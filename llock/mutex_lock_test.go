@@ -50,9 +50,9 @@ func TestRWMutex(t *testing.T) {
 	wg.Add(1)
 	// 协程1加读锁
 	go func() {
-		rwMutex.Lock()
+		rwMutex.RLock()
 		fmt.Println("协程1加读锁")
-		defer rwMutex.Unlock()
+		defer rwMutex.RUnlock()
 		time.Sleep(5 * time.Second)
 		wg.Done()
 	}()
@@ -62,9 +62,9 @@ func TestRWMutex(t *testing.T) {
 	wg.Add(1)
 	// 协程2加读锁
 	go func() {
-		if rwMutex.TryLock() {
+		if rwMutex.TryRLock() {
 			fmt.Println("协程2加读锁成功")
-			defer rwMutex.Lock()
+			defer rwMutex.RUnlock()
 			time.Sleep(5 * time.Second)
 		} else {
 			t.Error("协程2加读锁失败")
@@ -77,9 +77,9 @@ func TestRWMutex(t *testing.T) {
 	time.Sleep(1 * time.Second)
 	wg.Add(1)
 	go func() {
-		if rwMutex.TryRLock() {
-			fmt.Println("协程3加写锁成功")
-			defer rwMutex.RLock()
+		if rwMutex.TryLock() {
+			t.Error("协程3加写锁成功")
+			defer rwMutex.Unlock()
 			time.Sleep(5 * time.Second)
 		} else {
 			fmt.Println("协程3加写锁失败")
